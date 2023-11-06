@@ -18,6 +18,7 @@ void setup()
   pinMode(dataPin, OUTPUT);
 }
 
+// gbaby COM8
 byte onFanBytes = 0b00000100;
 byte onOffFanBytes = 0b00000000;
 
