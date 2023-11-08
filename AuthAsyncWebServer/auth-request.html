@@ -1,0 +1,119 @@
+username="admin", 
+realm="asyncesp", 
+nonce="795d0e2e77f0bd1ac56d88a223e30cc8", 
+uri="/", 
+response="de774df7dff5f8b7d4bbe13f5c7b4197", 
+opaque="0bc073c1bf61fa0ae678fa5892cfd2a6", 
+qop=auth, 
+nc=00000002, 
+cnonce="24ea2c0b01188731"
+
+
+
+ <script>
+    function sendAuthorizationRequest() {
+      // Simulate receiving the authentication challenge from the server
+      const authChallenge = {
+        username: "admin",
+        realm: "asyncesp",
+        nonce: "795d0e2e77f0bd1ac56d88a223e30cc8",
+        uri: "/",
+        qop: "auth",
+        nc: "00000002",
+        cnonce: "24ea2c0b01188731",
+        opaque: "0bc073c1bf61fa0ae678fa5892cfd2a6",
+      };
+
+      // Create a function to generate the response value
+      function generateResponse(username, password) {
+        const ha1 = btoa(username + ":" + authChallenge.realm + ":" + password);
+        const ha2 = btoa("POST:" + authChallenge.uri);
+        return btoa(ha1 + ":" + authChallenge.nonce + ":" + authChallenge.nc + ":" + authChallenge.cnonce + ":" + authChallenge.qop + ":" + ha2);
+      }
+
+      const username = "admin"; // Replace with the actual username
+      const password = "your_password"; // Replace with the actual password
+
+      // Prepare the Authorization header for the request
+      const authorizationHeader = `Digest username="${username}", realm="${authChallenge.realm}", nonce="${authChallenge.nonce}", uri="${authChallenge.uri}", response="${generateResponse(username, password)}", opaque="${authChallenge.opaque}", qop=${authChallenge.qop}, nc=${authChallenge.nc}, cnonce="${authChallenge.cnonce}"`;
+
+      // Make a Fetch request with the Authorization header
+      fetch("/your-server-endpoint", {
+        method: "POST", // Change the HTTP method as needed
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+        .then(response => response.text())
+        .then(data => {
+          // Handle the response from the server as needed
+          console.log(data);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+
+    // Trigger the request when the page loads
+    sendAuthorizationRequest();
+  </script>
+
+
+
+
+  <body>
+  <h1>Dynamic Authorization Challenge</h1>
+
+  <form id="authorization-form">
+    Username: <input type="text" name="username"><br>
+    Password: <input type="password" name="password"><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <script>
+    function fetchAuthorizationChallenge() {
+          // Handle the received authentication challenge
+          const username = document.querySelector('input[name="username"]').value;
+          const password = document.querySelector('input[name="password"]').value;
+
+          // Create the response value based on the dynamic challenge
+          const responseValue = generateResponse(username, password);
+          const requestEncodedData = btoa(`${username}:${password}`);
+          // Prepare the Authorization header for the request
+          const authorizationHeader = `Basic ${requestEncodedData}`;
+
+          // Make a Fetch request with the Authorization header
+          fetch("/", {
+            method: "GET", // Change the HTTP method as needed
+            headers: {
+              Authorization: authorizationHeader,
+            },
+          })
+            .then(response => response.text())
+            .then(data => {
+              // Handle the response from the server as needed
+              console.log(data);
+            })
+            .catch(error => {
+              console.error("Error:", error);
+            });
+        
+    }
+
+    function generateResponse(username, password, authChallenge) {
+      // Implement the response generation logic here based on the dynamic challenge.
+      // You may need to use the crypto library or other techniques to generate the response.
+      // Ensure the response generation follows the server's requirements.
+      // Example: calculate the response based on the dynamic challenge.
+      return "your_generated_response";
+    }
+
+    document.getElementById("authorization-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      fetchAuthorizationChallenge();
+    });
+  </script>
+</body>
+
+
+get: Encode to Base64 format admin:password YWRtaW46cGFzc3dvcmQ=
