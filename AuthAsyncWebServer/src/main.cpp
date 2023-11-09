@@ -166,14 +166,26 @@ void setup()
   // Print ESP Local IP Address
   Serial.println(WiFi.localIP());
 
+  server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    if(!request->authenticate(http_username, http_password)){
+      return request->requestAuthentication();
+    }else{
+      request->send(200, "text/plain", "OK");
+    }
+      
+       });
+
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             {
     if(!request->authenticate(http_username, http_password)){
-      return request->requestAuthentication();
+      request->send(401, "text/plain", "Not Authorized");
+    }else{
+      request->send_P(200, "text/html", index_html, processor);
     }
       
-      request->send_P(200, "text/html", index_html, processor); 
+       
       });
 
   server.on("/logout", HTTP_GET, [](AsyncWebServerRequest *request)

@@ -428,7 +428,7 @@ bool AsyncWebServerRequest::_parseReqHeader()
       }
       else
       {
-        //Serial.printf("[authorization]:[info]: value: %s\n", value);
+         //Serial.printf("[authorization]:[info]: value: %s\n", value);
         _authorization = value.substring(7);
       }
     }
@@ -1154,7 +1154,6 @@ void AsyncWebServerRequest::requestAuthentication(const char *realm, bool isDige
   //   r->addHeader("WWW-Authenticate", header);
   // }
   // send(r);
-
   AsyncWebServerResponse *r = beginResponse(401, "text/html", R"rawliteral(
 <!DOCTYPE HTML>
 <html>
@@ -1170,70 +1169,70 @@ void AsyncWebServerRequest::requestAuthentication(const char *realm, bool isDige
     <input type="submit" value="Submit">
   </form>
 
-  // <script>
-  //   function fetchAuthorizationChallenge() {
-  //         // Handle the received authentication challenge
-  //         const username = document.querySelector('input[name="username"]').value;
-  //         const password = document.querySelector('input[name="password"]').value;
+  <script>
+    function fetchAuthorizationChallenge() {
+          // Handle the received authentication challenge
+          const username = document.querySelector('input[name="username"]').value;
+          const password = document.querySelector('input[name="password"]').value;
 
-  //         // Create the response value based on the dynamic challenge
-  //         const responseValue = generateResponse(username, password);
+          // Create the response value based on the dynamic challenge
+          const responseValue = generateResponse(username, password);
+          const requestEncodedData = btoa(`${username}:${password}`);
+          // Prepare the Authorization header for the request
+          const authorizationHeader = `Basic ${requestEncodedData}`;
 
-  //         // Prepare the Authorization header for the request
-  //         const authorizationHeader = `username="${username}", response="${responseValue}""`;
-
-  //         // Make a Fetch request with the Authorization header
-  //         fetch("/", {
-  //           method: "POST", // Change the HTTP method as needed
-  //           headers: {
-  //             Authorization: authorizationHeader,
-  //           },
-  //         })
-  //           .then(response => response.text())
-  //           .then(data => {
-  //             // Handle the response from the server as needed
-  //             console.log(data);
-  //           })
-  //           .catch(error => {
-  //             console.error("Error:", error);
-  //           });
+          // Make a Fetch request with the Authorization header
+          fetch("/", {
+            method: "GET", // Change the HTTP method as needed
+            headers: {
+              Authorization: authorizationHeader,
+            },
+          })
+            .then(response => response.text())
+            .then(data => {
+              // Handle the response from the server as needed
+              console.log(data);
+            })
+            .catch(error => {
+              console.error("Error:", error);
+            });
         
-  //   }
+    }
 
-  //   function generateResponse(username, password, authChallenge) {
-  //     // Implement the response generation logic here based on the dynamic challenge.
-  //     // You may need to use the crypto library or other techniques to generate the response.
-  //     // Ensure the response generation follows the server's requirements.
-  //     // Example: calculate the response based on the dynamic challenge.
-  //     return "your_generated_response";
-  //   }
+    function generateResponse(username, password, authChallenge) {
+      // Implement the response generation logic here based on the dynamic challenge.
+      // You may need to use the crypto library or other techniques to generate the response.
+      // Ensure the response generation follows the server's requirements.
+      // Example: calculate the response based on the dynamic challenge.
+      return "your_generated_response";
+    }
 
-  //   document.getElementById("authorization-form").addEventListener("submit", function(event) {
-  //     event.preventDefault();
-  //     fetchAuthorizationChallenge();
-  //   });
-  // </script>
+    document.getElementById("authorization-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      fetchAuthorizationChallenge();
+    });
+  </script>
 </body>
 </html>
 )rawliteral");
 
-  if (!isDigest && realm == NULL)
-  {
-    // r->addHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
-  }
-  else if (!isDigest)
-  {
-    String header = "Basic realm=\"";
-    header.concat(realm);
-    header.concat("\"");
-    // r->addHeader("WWW-Authenticate", header);
-  }
-  else
-  {
-    String header = "Digest ";
-    header.concat(requestDigestAuthentication(realm));
-    // r->addHeader("WWW-Authenticate", header);
-  }
+  // if (!isDigest && realm == NULL)
+  // {
+  //   // r->addHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
+  // }
+  // else if (!isDigest)
+  // {
+  //   String header = "Basic realm=\"";
+  //   header.concat(realm);
+  //   header.concat("\"");
+  //   // r->addHeader("WWW-Authenticate", header);
+  // }
+  // else
+  // {
+  //   String header = "Digest ";
+  //   header.concat(requestDigestAuthentication(realm));
+  //   // r->addHeader("WWW-Authenticate", header);
+  // }
 
   send(r);
 }
