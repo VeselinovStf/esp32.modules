@@ -154,11 +154,15 @@ void setup()
     request->send_P(200, "text/html", index_html, processor); });
 
   server.on("/logout", HTTP_GET, [](AsyncWebServerRequest *request)
-            { 
-              
-              request->send(401);
-              
-               });
+            {
+              AsyncWebServerResponse *response = request->beginResponse(401);
+              response->addHeader("WWW-Authenticate", "");
+              response->addHeader("Authorization", "");
+
+              request->send(response);
+
+              request->redirect("/");
+            });
 
   server.on("/logged-out", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send_P(200, "text/html", logout_html, processor); });
