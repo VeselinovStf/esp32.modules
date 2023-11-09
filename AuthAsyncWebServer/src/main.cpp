@@ -17,8 +17,6 @@
 #include <ESPAsyncTCP.h>
 #endif
 #include <ESPAsyncWebServer.h>
-#include <serve_control_request_handler.h>
-#include <authorizer.h>
 
 // Replace with your network credentials
 const char *ssid = "A1_41C2";
@@ -33,23 +31,6 @@ const int output = 2;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
-
-const char login_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML>
-<html>
-<head>
-  <title>Login Page</title>
-</head>
-<body>
-  <h1>Custom Login Page</h1>
-  <form action="/login" method="post">
-    Username: <input type="text" name="username"><br>
-    Password: <input type="password" name="password"><br>
-    <input type="submit" value="Login">
-  </form>
-</body>
-</html>
-)rawliteral";
 
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
@@ -162,36 +143,22 @@ void setup()
     Serial.println("Connecting to WiFi..");
   }
 
-  delay(3000);
-
-  Serial.println("[Starting Auth Web Server Example]");
   // Print ESP Local IP Address
   Serial.println(WiFi.localIP());
-
-  server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    if(!request->authenticate(http_username, http_password)){
-      return request->requestAuthentication();
-    }else{
-      request->send(200, "text/plain", "OK");
-    }
-      
-       });
 
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-    if(!request->authenticate(http_username, http_password)){
-      request->send(401, "text/plain", "Not Authorized");
-    }else{
-      request->send_P(200, "text/html", index_html, processor);
-    }
-      
-       
-      });
+    if(!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+    request->send_P(200, "text/html", index_html, processor); });
 
   server.on("/logout", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(401); });
+            { 
+              
+              request->send(401);
+              
+               });
 
   server.on("/logged-out", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send_P(200, "text/html", logout_html, processor); });
@@ -216,9 +183,6 @@ void setup()
     Serial.println(inputMessage);
     request->send(200, "text/plain", "OK"); });
 
-  server.addHandler(new ServeControlRequestHandler())
-    .setFilter(Authorizer::authorizationFilter);
-    
   // Start server
   server.begin();
 }
