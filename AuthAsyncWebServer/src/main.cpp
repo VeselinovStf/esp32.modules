@@ -17,6 +17,8 @@
 #include <ESPAsyncTCP.h>
 #endif
 #include <ESPAsyncWebServer.h>
+#include <serve_control_request_handler.h>
+#include <authorizer.h>
 
 // Replace with your network credentials
 const char *ssid = "A1_41C2";
@@ -214,6 +216,9 @@ void setup()
     Serial.println(inputMessage);
     request->send(200, "text/plain", "OK"); });
 
+  server.addHandler(new ServeControlRequestHandler())
+    .setFilter(Authorizer::authorizationFilter);
+    
   // Start server
   server.begin();
 }
