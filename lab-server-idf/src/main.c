@@ -1,190 +1,141 @@
-#include <esp_http_server.h>
-#include <esp_log.h>
+/* HTTP Restful API Server Example
 
-#include "freertos/event_groups.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "nvs_flash.h"
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-#include "lwip/err.h"
-#include "lwip/sys.h"
-
-/* The examples use WiFi configuration that you can set via project configuration menu
-
-   If you'd rather not, just change the below entries to strings with
-   the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
 */
-#define EXAMPLE_ESP_WIFI_SSID      "M-Tel_Stefan"
-#define EXAMPLE_ESP_WIFI_PASS      "0886028930"
-#define EXAMPLE_ESP_MAXIMUM_RETRY  5
+#include "sdkconfig.h"
+#include "driver/gpio.h"
+#include "esp_vfs_semihost.h"
+#include "esp_vfs_fat.h"
+#include "esp_spiffs.h"
+#include "sdmmc_cmd.h"
+#include "nvs_flash.h"
+#include "esp_netif.h"
+#include "esp_event.h"
+#include "esp_log.h"
+#include "mdns.h"
+//#include "protocol_examples_common.h"
 
-// Logging
-static const char *TAG = "[LAB-SERVER]";
+#include "lwip/apps/netbiosns.h"
+#if CONFIG_EXAMPLE_WEB_DEPLOY_SD
+#include "driver/sdmmc_host.h"
+#endif
 
-/* FreeRTOS event group to signal when we are connected*/
-static EventGroupHandle_t s_wifi_event_group;
+#define MDNS_INSTANCE "esp home web server"
 
-/* The event group allows multiple bits for each event, but we only care about two events:
- * - we are connected to the AP with an IP
- * - we failed to connect after the maximum amount of retries */
-#define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT      BIT1
+static const char *TAG = "example";
 
-static int s_retry_num = 0;
+esp_err_t start_rest_server(const char *base_path);
 
-static void event_handler(void* arg, esp_event_base_t event_base,
-                                int32_t event_id, void* event_data)
+static void initialise_mdns(void)
 {
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        esp_wifi_connect();
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY) {
-            esp_wifi_connect();
-            s_retry_num++;
-            ESP_LOGI(TAG, "retry to connect to the AP");
-        } else {
-            xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
-        }
-        ESP_LOGI(TAG,"connect to the AP fail");
-    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-        ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
-        s_retry_num = 0;
-        xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
-    }
+    mdns_init();
+    mdns_hostname_set(CONFIG_EXAMPLE_MDNS_HOST_NAME);
+    mdns_instance_name_set(MDNS_INSTANCE);
+
+    mdns_txt_item_t serviceTxtData[] = {
+        {"board", "esp32"},
+        {"path", "/"}
+    };
+
+    ESP_ERROR_CHECK(mdns_service_add("ESP32-WebServer", "_http", "_tcp", 80, serviceTxtData,
+                                     sizeof(serviceTxtData) / sizeof(serviceTxtData[0])));
 }
 
-
-
-
-/* Our URI handler function to be called during GET /test request */
-esp_err_t test_handler(httpd_req_t *req)
+#if CONFIG_EXAMPLE_WEB_DEPLOY_SEMIHOST
+esp_err_t init_fs(void)
 {
-    const char resp[] = "<h1>Hello World</h1>";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    esp_err_t ret = esp_vfs_semihost_register(CONFIG_EXAMPLE_WEB_MOUNT_POINT);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to register semihost driver (%s)!", esp_err_to_name(ret));
+        return ESP_FAIL;
+    }
     return ESP_OK;
 }
+#endif
 
-/* URI handler structure for GET /test */
-httpd_uri_t test_uri = {
-    .uri      = "/test",
-    .method   = HTTP_GET,
-    .handler  = test_handler,
-    .user_ctx = NULL
-};
-
-// Server
-static httpd_handle_t start_server(void){
-    httpd_handle_t s = NULL;
-    httpd_config_t c = HTTPD_DEFAULT_CONFIG();
-
-    if(httpd_start(&s, &c) == ESP_OK){
-        ESP_LOGI(TAG, "Registering URI handlers");
-        /* Register URI handlers */
-        httpd_register_uri_handler(s, &test_uri);
-    }
-
-     /* If server failed to start, handle will be NULL */
-     return s;
-}
-
-/* Function for stopping the webserver */
-void stop_webserver(httpd_handle_t s)
+#if CONFIG_EXAMPLE_WEB_DEPLOY_SD
+esp_err_t init_fs(void)
 {
-    if (s) {
-        /* Stop the httpd server */
-        httpd_stop(s);
-    }
-}
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
 
-void wifi_init_sta(void)
-{
-    s_wifi_event_group = xEventGroupCreate();
+    gpio_set_pull_mode(15, GPIO_PULLUP_ONLY); // CMD
+    gpio_set_pull_mode(2, GPIO_PULLUP_ONLY);  // D0
+    gpio_set_pull_mode(4, GPIO_PULLUP_ONLY);  // D1
+    gpio_set_pull_mode(12, GPIO_PULLUP_ONLY); // D2
+    gpio_set_pull_mode(13, GPIO_PULLUP_ONLY); // D3
 
-    ESP_ERROR_CHECK(esp_netif_init());
-
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_sta();
-
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-
-    esp_event_handler_instance_t instance_any_id;
-    esp_event_handler_instance_t instance_got_ip;
-
-    ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
-                                                        ESP_EVENT_ANY_ID,
-                                                        &event_handler,
-                                                        NULL,
-                                                        &instance_any_id));
-
-    ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
-                                                        IP_EVENT_STA_GOT_IP,
-                                                        &event_handler,
-                                                        NULL,
-                                                        &instance_got_ip));
-
-    wifi_config_t wifi_config = {
-        .sta = {
-            .ssid = EXAMPLE_ESP_WIFI_SSID,
-            .password = EXAMPLE_ESP_WIFI_PASS,
-            /* Setting a password implies station will connect to all security modes including WEP/WPA.
-             * However these modes are deprecated and not advisable to be used. Incase your Access point
-             * doesn't support WPA2, these mode can be enabled by commenting below line */
-	     .threshold.authmode = WIFI_AUTH_WPA2_PSK,
-
-            .pmf_cfg = {
-                .capable = true,
-                .required = false
-            },
-        },
+    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = true,
+        .max_files = 4,
+        .allocation_unit_size = 16 * 1024
     };
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
-    ESP_ERROR_CHECK(esp_wifi_start() );
 
-    ESP_LOGI(TAG, "wifi_init_sta finished.");
-
-    /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
-     * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
-    EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
-            WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
-            pdFALSE,
-            pdFALSE,
-            portMAX_DELAY);
-
-    /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
-     * happened. */
-    if (bits & WIFI_CONNECTED_BIT) {
-        ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
-                 EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
-    } else if (bits & WIFI_FAIL_BIT) {
-        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
-                 EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
-    } else {
-        ESP_LOGE(TAG, "UNEXPECTED EVENT");
+    sdmmc_card_t *card;
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount(CONFIG_EXAMPLE_WEB_MOUNT_POINT, &host, &slot_config, &mount_config, &card);
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE(TAG, "Failed to mount filesystem.");
+        } else {
+            ESP_LOGE(TAG, "Failed to initialize the card (%s)", esp_err_to_name(ret));
+        }
+        return ESP_FAIL;
     }
-
-    /* The event will not be processed after unregister */
-    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
-    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
-    vEventGroupDelete(s_wifi_event_group);
+    /* print card info if mount successfully */
+    sdmmc_card_print_info(stdout, card);
+    return ESP_OK;
 }
+#endif
 
+#if CONFIG_EXAMPLE_WEB_DEPLOY_SF
+esp_err_t init_fs(void)
+{
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = CONFIG_EXAMPLE_WEB_MOUNT_POINT,
+        .partition_label = NULL,
+        .max_files = 5,
+        .format_if_mount_failed = false
+    };
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
-void app_main() {
-    //Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-      ESP_ERROR_CHECK(nvs_flash_erase());
-      ret = nvs_flash_init();
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE(TAG, "Failed to mount or format filesystem");
+        } else if (ret == ESP_ERR_NOT_FOUND) {
+            ESP_LOGE(TAG, "Failed to find SPIFFS partition");
+        } else {
+            ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        }
+        return ESP_FAIL;
     }
 
-    ESP_ERROR_CHECK(ret);
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+    } else {
+        ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+    }
+    return ESP_OK;
+}
+#endif
 
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-    wifi_init_sta();
+void app_main(void)
+{
+    ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    static httpd_handle_t s = NULL;
-    s = start_server();
+    initialise_mdns();
+    netbiosns_init();
+    netbiosns_set_name(CONFIG_EXAMPLE_MDNS_HOST_NAME);
+
+    ESP_ERROR_CHECK(example_connect());
+
+    ESP_ERROR_CHECK(init_fs());
+    ESP_ERROR_CHECK(start_rest_server(CONFIG_EXAMPLE_WEB_MOUNT_POINT));
 }
