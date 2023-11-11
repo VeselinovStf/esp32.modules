@@ -105,7 +105,7 @@ menu "SERVER Configuration"
     if EXAMPLE_WEB_DEPLOY_SEMIHOST
         config EXAMPLE_HOST_PATH_TO_MOUNT
             string "Host path to mount (e.g. absolute path to web dist directory)"
-            default "PATH-TO-WEB-DIST_DIR"
+            default "C:\Users\Doni2\HUB\esp32.modules\lab-server-idf\front\web-demo\dist"
             help
                 When using semihost in ESP32, you should specify the host path which will be mounted to VFS.
                 Note that only absolute path is acceptable.
