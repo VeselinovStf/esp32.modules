@@ -1,32 +1,34 @@
-# _Sample project_
+# VespertineWebHub
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+Welcome to VespertineWebHub, a project that seamlessly integrates the Vue.js app "Gaby.tech" with the ESP-IDF framework, providing a sophisticated web server for handling logic and serving the Vue.js application.
 
-This is the simplest buildable example. The example is used by command `idf.py create-project`
-that copies the project to user specified path and set it's name. For more information follow the [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project)
+## Overview
 
+VespertineWebHub combines the elegance of Vue.js with the robust capabilities of ESP-IDF to create a dynamic web server capable of serving and managing the Gaby.tech app. The project's name reflects a blend of twilight sophistication ("Vespertine"), the ESP-IDF framework ("esp"), and the central role of handling web logic ("WebHub").
 
+## Features
 
-## How to use example
-We encourage the users to use the example as a template for the new projects.
-A recommended way is to follow the instructions on a [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project).
+- **Luminous Facade:** Orchestrates a seamless interaction between ESP-IDF and Vue.js, serving as the project's central hub.
+  
+- **Zenith Logic Handler:** Manages the intricate logic of the "Gaby.tech" app, ensuring efficient execution of web-based functionalities.
 
-## Example folder contents
+- **Ephemeral Router:** Swiftly handles web requests, directing traffic through the server with responsive routing for the Vue.js app.
 
-The project **sample_project** contains one source file in C language [main.c](main/main.c). The file is located in folder [main](main).
+- **Nebula Data Broker:** Facilitates the exchange of data between ESP-IDF and Vue.js, ensuring seamless communication.
 
-ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt`
-files that provide set of directives and instructions describing the project's source files and targets
-(executable, library, or both). 
+- **Spectra Web Server:** Establishes a spectral web server using ESP-IDF, serving the Vue.js app with finesse and sophistication.
 
-Below is short explanation of remaining files in the project folder.
+## Getting Started
 
-```
-├── CMakeLists.txt
-├── main
-│   ├── CMakeLists.txt
-│   └── main.c
-└── README.md                  This is the file you are currently reading
-```
-Additionally, the sample project contains Makefile and component.mk files, used for the legacy Make based build system. 
-They are not used or needed when building with CMake and idf.py.
+To get started with VespertineWebHub, follow these steps:
+
+1. Clone the repository: `git clone https://github.com/veselinovStf/VespertineWebHub.git`
+2. Navigate to the project directory: `cd VespertineWebHub`
+3. [Additional Setup Steps if any]
+
+## Usage
+
+[Include instructions on how to use or deploy the VespertineWebHub. Provide any configuration steps, if necessary.]
+
+```bash
+# Example command or code snippet
