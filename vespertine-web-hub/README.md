@@ -8,15 +8,25 @@ VespertineWebHub combines the elegance of Vue.js with the robust capabilities of
 
 ## Features
 
-- **Luminous Facade:** Orchestrates a seamless interaction between ESP-IDF and Vue.js, serving as the project's central hub.
+## DNS Integration: VortexDNS
+
+VespertineWebHub incorporates the VortexDNS component to seamlessly manage Domain Name System (DNS) resolution. This component ensures a smooth interaction between the ESP-IDF framework and Vue.js, serving as a pivotal element in the overall architecture.
+
+### Features
+
+- **Dynamic Resolution:** Orchestrates DNS resolution dynamically, enhancing the web server's capabilities.
   
-- **Zenith Logic Handler:** Manages the intricate logic of the "Gaby.tech" app, ensuring efficient execution of web-based functionalities.
+- **Configurable Settings:** Enables easy configuration of DNS settings, allowing users to tailor the resolution process to their specific needs.
 
-- **Ephemeral Router:** Swiftly handles web requests, directing traffic through the server with responsive routing for the Vue.js app.
+### Usage
 
-- **Nebula Data Broker:** Facilitates the exchange of data between ESP-IDF and Vue.js, ensuring seamless communication.
+To leverage VortexDNS in VespertineWebHub, follow these steps:
 
-- **Spectra Web Server:** Establishes a spectral web server using ESP-IDF, serving the Vue.js app with finesse and sophistication.
+1. Ensure that the VortexDNS component is included in your project's `CMakeLists.txt` file.
+   
+   ```cmake
+   idf_component_register(SRCS "vortex_dns.c"
+                          INCLUDE_DIRS "dns")
 
 ## Getting Started
 
