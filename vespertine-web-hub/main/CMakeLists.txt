@@ -1,7 +1,8 @@
 idf_component_register(SRCS "main.c"
                             "rest_server.c"
                     INCLUDE_DIRS "."
-                    PRIV_REQUIRES esp_netif driver esp_wifi vfs nvs_flash fatfs spiffs esp_http_server json)
+                    PRIV_REQUIRES esp_netif driver esp_wifi vfs nvs_flash fatfs spiffs esp_http_server json
+                    REQUIRES gbaby_wifi mdns gbaby_fs)
 
 
 set(WEB_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../front/web-demo")

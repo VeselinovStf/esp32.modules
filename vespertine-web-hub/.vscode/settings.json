@@ -14,5 +14,9 @@
     "idf.portWin": "COM5",
     "idf.pythonBinPathWin": "C:\\Users\\Doni2\\.espressif\\python_env\\idf5.1_py3.11_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "C:\\Users\\Doni2\\.espressif",
-    "idf.flashType": "JTAG"
+    "idf.flashType": "JTAG",
+    "files.associations": {
+        "esp_log.h": "c",
+        "gbaby_wifi.h": "c"
+    }
 }
