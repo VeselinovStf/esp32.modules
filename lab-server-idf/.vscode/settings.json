@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "inet.h": "c"
+        "inet.h": "c",
+        "esp_vfs_fat.h": "c",
+        "esp_spiffs.h": "c",
+        "esp_http_server.h": "c",
+        "esp_event.h": "c",
+        "cjson.h": "c"
     }
 }

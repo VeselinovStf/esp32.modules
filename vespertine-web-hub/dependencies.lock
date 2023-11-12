@@ -1,0 +1,21 @@
+dependencies:
+  espressif/mdns:
+    component_hash: 810ec139689ae93bf42520d05de4855fbb68f7140ef67797d91d8d61829589cb
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.2.2
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.1.1
+  protocol_examples_common:
+    component_hash: null
+    source:
+      path: C:\Users\Doni2\esp-idf\examples\common_components\protocol_examples_common
+      type: local
+    version: '*'
+manifest_hash: 983200fd28ac1532bfccf5b485a009d392172b0af3b8f962ca8f1fc392278ae5
+target: esp32
+version: 1.0.0
