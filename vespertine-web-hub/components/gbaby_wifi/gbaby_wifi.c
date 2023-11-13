@@ -13,10 +13,13 @@
  */
 
 #include <string.h>
+#include "sdkconfig.h"
 #include "gbaby_wifi.h"
-
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 #include "esp_log.h"
-
+#include "esp_wifi.h"
+#include "connect.h"
 
 
 static const char *TAG = "example_connect";
@@ -241,8 +244,8 @@ esp_err_t example_wifi_connect(void)
     wifi_config_t wifi_config = {
         .sta = {
 #if !CONFIG_EXAMPLE_WIFI_SSID_PWD_FROM_STDIN
-            .ssid = CONFIG_EXAMPLE_WIFI_SSID,
-            .password = CONFIG_EXAMPLE_WIFI_PASSWORD,
+            .ssid = CONFIG_WIFI_SSID,
+            .password = CONFIG_WIFI_PASSWORD,
 #endif
             .scan_method = EXAMPLE_WIFI_SCAN_METHOD,
             .sort_method = EXAMPLE_WIFI_CONNECT_AP_SORT_METHOD,
