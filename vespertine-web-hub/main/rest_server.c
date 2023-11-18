@@ -15,6 +15,13 @@
 #include "esp_vfs.h"
 #include "cJSON.h"
 
+#include "gbaby_esp.h"
+#include "shift_reley_module.h"
+
+#define LP 4  // SH/LD PIN
+#define CP 2  // CLK PIN
+#define DP 15 // QH PIN
+
 static const char *REST_TAG = "esp-rest";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
     do                                                                                 \
@@ -168,7 +175,18 @@ static esp_err_t reley_post_handler(httpd_req_t *req)
     cJSON *root = cJSON_Parse(buf);
     
     ESP_LOGI(REST_TAG, "Reley Control: value = %s", cJSON_GetObjectItem(root, "value")->valuestring);
-    
+
+    uint8_t movingBytes = strtol(cJSON_GetObjectItem(root, "value")->valuestring, NULL, 2);
+
+    shift_reg_conf_t shift_reg_conf;
+
+    shift_reg_conf.latchPin = LP;
+    shift_reg_conf.clockPin = CP;
+    shift_reg_conf.dataPin = DP;
+
+    initShiftRelay(&shift_reg_conf);
+    sendToShiftRelay(movingBytes, &shift_reg_conf);
+
     cJSON_Delete(root);
     httpd_resp_sendstr(req, "Post control value successfully");
     return ESP_OK;
