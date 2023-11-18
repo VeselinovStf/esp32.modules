@@ -1,5 +1,5 @@
 /**
- * @file root_esp.c
+ * @file gbaby_esp.c
  * @author Stefan Veselinov (veselinovStf@gmail.com)
  * @brief Wrapper functions over esp-idf
  * @version 0.1
@@ -9,7 +9,7 @@
  *
  */
 
-#include "root_esp.h"
+#include "gbaby_esp.h"
 
 esp_err_t digitalWrite(uint8_t pin, uint8_t val)
 {
@@ -21,7 +21,8 @@ esp_err_t digitalWrite(uint8_t pin, uint8_t val)
     return ESP_OK;
 }
 
-int digitalRead(uint8_t pin){
+int digitalRead(uint8_t pin)
+{
     return gpio_get_level((gpio_num_t)pin);
 }
 
@@ -34,7 +35,7 @@ esp_err_t pinMode(uint8_t pin, gpio_mode_t mode)
         .mode = mode                           /*!< GPIO mode: set input/output mode                     */
     };
 
-   return gpio_config(&conf);
+    return gpio_config(&conf);
 }
 
 esp_err_t shiftIn(uint8_t dp, uint8_t clcp, uint8_t bo)

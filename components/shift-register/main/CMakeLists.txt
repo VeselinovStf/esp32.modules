@@ -1,2 +1,4 @@
-idf_component_register(SRCS "main.c" "ic74hc595.c" "root_esp.c"
-                    INCLUDE_DIRS ".")
+idf_component_register(SRCS "main.c"
+                    INCLUDE_DIRS "."
+                    PRIV_REQUIRES driver
+                    REQUIRES gbaby_esp shift_reley_module)

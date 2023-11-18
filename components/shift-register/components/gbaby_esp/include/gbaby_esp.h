@@ -1,5 +1,5 @@
 /**
- * @file root_esp.h
+ * @file gbaby_esp.h
  * @author Stefan Veselinov (veselinovStf@gmail.com)
  * @brief Wrapper functions over esp-idf
  * @version 0.1
