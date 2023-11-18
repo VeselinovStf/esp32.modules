@@ -20,5 +20,5 @@
         "gbaby_wifi.h": "c",
         "semphr.h": "c"
     },
-    "idf.flashType": "UART"
+    "idf.flashType": "JTAG"
 }
