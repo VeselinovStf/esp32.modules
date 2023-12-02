@@ -14,28 +14,28 @@
 
 esp_err_t initShiftRelay(shift_reg_conf_t *conf)
 {
-    pinMode(conf->latchPin, GPIO_MODE_OUTPUT);
-    pinMode(conf->clockPin, GPIO_MODE_OUTPUT);
-    pinMode(conf->dataPin, GPIO_MODE_OUTPUT);
+    // pinMode(conf->latchPin, GPIO_MODE_OUTPUT);
+    // pinMode(conf->clockPin, GPIO_MODE_OUTPUT);
+    // pinMode(conf->dataPin, GPIO_MODE_OUTPUT);
 
     return ESP_OK;
 };
 
 esp_err_t sendToShiftRelay(uint8_t movingBytes, shift_reg_conf_t *conf)
 {
-    if (digitalWrite(conf->latchPin, LOW) != ESP_OK)
-    {
-        printf("Can't set pin LOW\n");
-        return ESP_FAIL;
-    };
+    // if (digitalWrite(conf->latchPin, LOW) != ESP_OK)
+    // {
+    //     printf("Can't set pin LOW\n");
+    //     return ESP_FAIL;
+    // };
 
-    shiftOut(conf->dataPin, conf->clockPin, LSBFIRST, movingBytes);
+    // shiftOut(conf->dataPin, conf->clockPin, LSBFIRST, movingBytes);
 
-    if (digitalWrite(conf->latchPin, HIGH) != ESP_OK)
-    {
-        printf("Can't set pin HIGH\n");
-        return ESP_FAIL;
-    };
+    // if (digitalWrite(conf->latchPin, HIGH) != ESP_OK)
+    // {
+    //     printf("Can't set pin HIGH\n");
+    //     return ESP_FAIL;
+    // };
 
     return ESP_OK;
 };

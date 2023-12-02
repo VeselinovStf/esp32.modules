@@ -59,6 +59,10 @@ static void initialise_mdns(void)
 
 void app_main(void)
 {
+    pinMode(27, GPIO_MODE_OUTPUT);
+    pinMode(25, GPIO_MODE_OUTPUT);
+    pinMode(33, GPIO_MODE_OUTPUT);
+
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
       ESP_ERROR_CHECK(nvs_flash_erase());
@@ -77,7 +81,7 @@ void app_main(void)
 
     ESP_ERROR_CHECK(init_fs());
 
-    pinMode(27, GPIO_MODE_OUTPUT);
+    
     
     ESP_ERROR_CHECK(start_rest_server("")); // TODO: CONFIG_EXAMPLE_WEB_MOUNT_POINT is not working
 }
