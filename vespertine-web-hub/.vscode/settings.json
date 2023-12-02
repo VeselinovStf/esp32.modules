@@ -18,7 +18,8 @@
     "files.associations": {
         "esp_log.h": "c",
         "gbaby_wifi.h": "c",
-        "semphr.h": "c"
+        "semphr.h": "c",
+        "esp_netif.h": "c"
     },
     "idf.flashType": "UART"
 }

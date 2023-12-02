@@ -146,183 +146,255 @@ static esp_err_t light_brightness_post_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+// /* Simple handler for light brightness control */
+// static esp_err_t releyNine_post_post_handler(httpd_req_t *req)
+// {
+//     int total_len = req->content_len;
+//     int cur_len = 0;
+//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
+//     int received = 0;
+//     if (total_len >= SCRATCH_BUFSIZE)
+//     {
+//         /* Respond with 500 Internal Server Error */
+//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
+//         return ESP_FAIL;
+//     }
+//     while (cur_len < total_len)
+//     {
+//         received = httpd_req_recv(req, buf + cur_len, total_len);
+//         if (received <= 0)
+//         {
+//             /* Respond with 500 Internal Server Error */
+//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
+//             return ESP_FAIL;
+//         }
+//         cur_len += received;
+//     }
+//     buf[total_len] = '\0';
+
+//     cJSON *root = cJSON_Parse(buf);
+//     int status = cJSON_GetObjectItem(root, "status")->valueint;
+
+//     if (status > 0)
+//     {
+//         //onn
+//         if (digitalWrite(27,HIGH) != ESP_OK)
+//         {
+//             ESP_LOGE(REST_TAG, "Reley9 Can' start: Status = %d", status);
+//         }else{
+//             ESP_LOGI(REST_TAG, "Reley9 control ONN : Status = %d", status);
+//         }
+//     }
+//     else
+//     {
+//         //off
+//         if (digitalWrite(27, LOW) != ESP_OK)
+//         {
+//             ESP_LOGE(REST_TAG, "Reley9 Can' start: Status = %d", status);
+//         }
+//         else
+//         {
+//             ESP_LOGI(REST_TAG, "Reley9 control OFF : Status = %d", status);
+//         }
+//     }
+
+//     ESP_LOGI(REST_TAG, "Reley9 control: Status = %d", status);
+//     cJSON_Delete(root);
+//     httpd_resp_sendstr(req, "Reley9: Post control value successfully");
+//     return ESP_OK;
+// }
+
+// /* Simple handler for light brightness control */
+// static esp_err_t releyOne_post_post_handler(httpd_req_t *req)
+// {
+//     int total_len = req->content_len;
+//     int cur_len = 0;
+//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
+//     int received = 0;
+//     if (total_len >= SCRATCH_BUFSIZE)
+//     {
+//         /* Respond with 500 Internal Server Error */
+//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
+//         return ESP_FAIL;
+//     }
+//     while (cur_len < total_len)
+//     {
+//         received = httpd_req_recv(req, buf + cur_len, total_len);
+//         if (received <= 0)
+//         {
+//             /* Respond with 500 Internal Server Error */
+//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
+//             return ESP_FAIL;
+//         }
+//         cur_len += received;
+//     }
+//     buf[total_len] = '\0';
+
+//     cJSON *root = cJSON_Parse(buf);
+//     int status = cJSON_GetObjectItem(root, "status")->valueint;
+
+//     if (status > 0)
+//     {
+//         // onn
+//         if (digitalWrite(33, HIGH) != ESP_OK)
+//         {
+//             ESP_LOGE(REST_TAG, "Reley1 Can' start: Status = %d", status);
+//         }
+//         else
+//         {
+//             ESP_LOGI(REST_TAG, "Reley1 control ONN : Status = %d", status);
+//         }
+//     }
+//     else
+//     {
+//         // off
+//         if (digitalWrite(33, LOW) != ESP_OK)
+//         {
+//             ESP_LOGE(REST_TAG, "Reley1 Can' start: Status = %d", status);
+//         }
+//         else
+//         {
+//             ESP_LOGI(REST_TAG, "Reley1 control OFF : Status = %d", status);
+//         }
+//     }
+
+//     ESP_LOGI(REST_TAG, "Reley1 control: Status = %d", status);
+//     cJSON_Delete(root);
+//     httpd_resp_sendstr(req, "Reley1: Post control value successfully");
+//     return ESP_OK;
+// }
+
 /* Simple handler for light brightness control */
-static esp_err_t releyNine_post_post_handler(httpd_req_t *req)
+// static esp_err_t releyTwo_post_post_handler(httpd_req_t *req)
+// {
+//     int total_len = req->content_len;
+//     int cur_len = 0;
+//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
+//     int received = 0;
+//     if (total_len >= SCRATCH_BUFSIZE)
+//     {
+//         /* Respond with 500 Internal Server Error */
+//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
+//         return ESP_FAIL;
+//     }
+//     while (cur_len < total_len)
+//     {
+//         received = httpd_req_recv(req, buf + cur_len, total_len);
+//         if (received <= 0)
+//         {
+//             /* Respond with 500 Internal Server Error */
+//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
+//             return ESP_FAIL;
+//         }
+//         cur_len += received;
+//     }
+//     buf[total_len] = '\0';
+
+//     cJSON *root = cJSON_Parse(buf);
+//     int status = cJSON_GetObjectItem(root, "status")->valueint;
+
+//     if (status > 0)
+//     {
+//         // onn
+//         if (digitalWrite(25, HIGH) != ESP_OK)
+//         {
+//             ESP_LOGE(REST_TAG, "Reley2 Can' start: Status = %d", status);
+//         }
+//         else
+//         {
+//             ESP_LOGI(REST_TAG, "Reley2 control ONN : Status = %d", status);
+//         }
+//     }
+//     else
+//     {
+//         // off
+//         if (digitalWrite(25, LOW) != ESP_OK)
+//         {
+//             ESP_LOGE(REST_TAG, "Reley2 Can' start: Status = %d", status);
+//         }
+//         else
+//         {
+//             ESP_LOGI(REST_TAG, "Reley2 control OFF : Status = %d", status);
+//         }
+//     }
+
+//     ESP_LOGI(REST_TAG, "Reley2 control: Status = %d", status);
+//     cJSON_Delete(root);
+//     httpd_resp_sendstr(req, "Reley2: Post control value successfully");
+//     return ESP_OK;
+// }
+
+// /* Simple handler for light brightness control */
+// static esp_err_t reley_post_handler(httpd_req_t *req)
+// {
+//     int total_len = req->content_len;
+//     int cur_len = 0;
+//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
+//     int received = 0;
+//     if (total_len >= SCRATCH_BUFSIZE)
+//     {
+//         /* Respond with 500 Internal Server Error */
+//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
+//         return ESP_FAIL;
+//     }
+//     while (cur_len < total_len)
+//     {
+//         received = httpd_req_recv(req, buf + cur_len, total_len);
+//         if (received <= 0)
+//         {
+//             /* Respond with 500 Internal Server Error */
+//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
+//             return ESP_FAIL;
+//         }
+//         cur_len += received;
+//     }
+//     buf[total_len] = '\0';
+
+//     cJSON *root = cJSON_Parse(buf);
+    
+//     ESP_LOGI(REST_TAG, "Reley Control: value = %s", cJSON_GetObjectItem(root, "value")->valuestring);
+
+//     uint8_t movingBytes = strtol(cJSON_GetObjectItem(root, "value")->valuestring, NULL, 2);
+
+//     shift_reg_conf_t shift_reg_conf;
+
+//     shift_reg_conf.latchPin = LP;
+//     shift_reg_conf.clockPin = CP;
+//     shift_reg_conf.dataPin = DP;
+
+//     initShiftRelay(&shift_reg_conf);
+//     sendToShiftRelay(movingBytes, &shift_reg_conf);
+
+//     cJSON_Delete(root);
+//     httpd_resp_sendstr(req, "Post control value successfully");
+//     return ESP_OK;
+// }
+
+// Define a structure to hold pin numbers
+typedef struct
 {
-    int total_len = req->content_len;
-    int cur_len = 0;
-    char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-    int received = 0;
-    if (total_len >= SCRATCH_BUFSIZE)
-    {
-        /* Respond with 500 Internal Server Error */
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-        return ESP_FAIL;
-    }
-    while (cur_len < total_len)
-    {
-        received = httpd_req_recv(req, buf + cur_len, total_len);
-        if (received <= 0)
-        {
-            /* Respond with 500 Internal Server Error */
-            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-            return ESP_FAIL;
-        }
-        cur_len += received;
-    }
-    buf[total_len] = '\0';
+    gpio_num_t pin;
+} RelayConfig;
 
-    cJSON *root = cJSON_Parse(buf);
-    int status = cJSON_GetObjectItem(root, "status")->valueint;
+// Define an array of structures with GPIO pin numbers
+RelayConfig relayPins[] = {
+    {33}, // Example pin, replace with your actual GPIO pin numbers
+    {25}, // Add more pins as needed
+    {27}, // Add more pins as needed
+    // ...
+};
 
-    if (status > 0)
+void setRelayState(int index, uint8_t bitValue)
+{
+    // Ensure that the index is within the valid range
+    if (index < sizeof(relayPins) / sizeof(relayPins[0]))
     {
-        //onn
-        if (digitalWrite(27,HIGH) != ESP_OK)
-        {
-            ESP_LOGE(REST_TAG, "Reley9 Can' start: Status = %d", status);
-        }else{
-            ESP_LOGI(REST_TAG, "Reley9 control ONN : Status = %d", status);
-        }
+        // Set the GPIO pin based on the bit value
+        gpio_set_level(relayPins[index].pin, bitValue);
     }
-    else
-    {
-        //off
-        if (digitalWrite(27, LOW) != ESP_OK)
-        {
-            ESP_LOGE(REST_TAG, "Reley9 Can' start: Status = %d", status);
-        }
-        else
-        {
-            ESP_LOGI(REST_TAG, "Reley9 control OFF : Status = %d", status);
-        }
-    }
-
-    ESP_LOGI(REST_TAG, "Reley9 control: Status = %d", status);
-    cJSON_Delete(root);
-    httpd_resp_sendstr(req, "Reley9: Post control value successfully");
-    return ESP_OK;
 }
 
-/* Simple handler for light brightness control */
-static esp_err_t releyOne_post_post_handler(httpd_req_t *req)
-{
-    int total_len = req->content_len;
-    int cur_len = 0;
-    char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-    int received = 0;
-    if (total_len >= SCRATCH_BUFSIZE)
-    {
-        /* Respond with 500 Internal Server Error */
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-        return ESP_FAIL;
-    }
-    while (cur_len < total_len)
-    {
-        received = httpd_req_recv(req, buf + cur_len, total_len);
-        if (received <= 0)
-        {
-            /* Respond with 500 Internal Server Error */
-            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-            return ESP_FAIL;
-        }
-        cur_len += received;
-    }
-    buf[total_len] = '\0';
 
-    cJSON *root = cJSON_Parse(buf);
-    int status = cJSON_GetObjectItem(root, "status")->valueint;
-
-    if (status > 0)
-    {
-        // onn
-        if (digitalWrite(33, HIGH) != ESP_OK)
-        {
-            ESP_LOGE(REST_TAG, "Reley1 Can' start: Status = %d", status);
-        }
-        else
-        {
-            ESP_LOGI(REST_TAG, "Reley1 control ONN : Status = %d", status);
-        }
-    }
-    else
-    {
-        // off
-        if (digitalWrite(33, LOW) != ESP_OK)
-        {
-            ESP_LOGE(REST_TAG, "Reley1 Can' start: Status = %d", status);
-        }
-        else
-        {
-            ESP_LOGI(REST_TAG, "Reley1 control OFF : Status = %d", status);
-        }
-    }
-
-    ESP_LOGI(REST_TAG, "Reley1 control: Status = %d", status);
-    cJSON_Delete(root);
-    httpd_resp_sendstr(req, "Reley1: Post control value successfully");
-    return ESP_OK;
-}
-
-/* Simple handler for light brightness control */
-static esp_err_t releyTwo_post_post_handler(httpd_req_t *req)
-{
-    int total_len = req->content_len;
-    int cur_len = 0;
-    char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-    int received = 0;
-    if (total_len >= SCRATCH_BUFSIZE)
-    {
-        /* Respond with 500 Internal Server Error */
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-        return ESP_FAIL;
-    }
-    while (cur_len < total_len)
-    {
-        received = httpd_req_recv(req, buf + cur_len, total_len);
-        if (received <= 0)
-        {
-            /* Respond with 500 Internal Server Error */
-            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-            return ESP_FAIL;
-        }
-        cur_len += received;
-    }
-    buf[total_len] = '\0';
-
-    cJSON *root = cJSON_Parse(buf);
-    int status = cJSON_GetObjectItem(root, "status")->valueint;
-
-    if (status > 0)
-    {
-        // onn
-        if (digitalWrite(25, HIGH) != ESP_OK)
-        {
-            ESP_LOGE(REST_TAG, "Reley2 Can' start: Status = %d", status);
-        }
-        else
-        {
-            ESP_LOGI(REST_TAG, "Reley2 control ONN : Status = %d", status);
-        }
-    }
-    else
-    {
-        // off
-        if (digitalWrite(25, LOW) != ESP_OK)
-        {
-            ESP_LOGE(REST_TAG, "Reley2 Can' start: Status = %d", status);
-        }
-        else
-        {
-            ESP_LOGI(REST_TAG, "Reley2 control OFF : Status = %d", status);
-        }
-    }
-
-    ESP_LOGI(REST_TAG, "Reley2 control: Status = %d", status);
-    cJSON_Delete(root);
-    httpd_resp_sendstr(req, "Reley2: Post control value successfully");
-    return ESP_OK;
-}
 
 /* Simple handler for light brightness control */
 static esp_err_t reley_post_handler(httpd_req_t *req)
@@ -351,25 +423,37 @@ static esp_err_t reley_post_handler(httpd_req_t *req)
     buf[total_len] = '\0';
 
     cJSON *root = cJSON_Parse(buf);
-    
+
     ESP_LOGI(REST_TAG, "Reley Control: value = %s", cJSON_GetObjectItem(root, "value")->valuestring);
 
-    uint8_t movingBytes = strtol(cJSON_GetObjectItem(root, "value")->valuestring, NULL, 2);
+    // uint8_t movingBytes = strtol(cJSON_GetObjectItem(root, "value")->valuestring, NULL, 2);
 
-    shift_reg_conf_t shift_reg_conf;
+    // // Loop through each bit of movingBytes
+    // for (int i = 0; i < 8; i++)
+    char *valueString = cJSON_GetObjectItem(root, "value")->valuestring;
+    uint8_t movingBytes = strtol(valueString, NULL, 2);
 
-    shift_reg_conf.latchPin = LP;
-    shift_reg_conf.clockPin = CP;
-    shift_reg_conf.dataPin = DP;
+    size_t movingBytesLength = strlen(valueString);
 
-    initShiftRelay(&shift_reg_conf);
-    sendToShiftRelay(movingBytes, &shift_reg_conf);
+    size_t totalRelayPins = sizeof(relayPins) / sizeof(relayPins[0]);
+
+    // Loop through each bit of movingBytes and check if i is within the range of totalRelayPins
+    for (size_t i = 0; i < movingBytesLength && i < totalRelayPins; i++)
+    {
+        // Extract the i-th bit value using bitwise AND
+        uint8_t bitValue = (movingBytes >> i) & 0x01;
+
+        // Set the relay state based on the bit value and index
+        setRelayState(i, bitValue);
+
+        // You may introduce a delay here if needed
+        //vTaskDelay(pdMS_TO_TICKS(100)); // Example: 100 ms delay
+    }
 
     cJSON_Delete(root);
-    httpd_resp_sendstr(req, "Post control value successfully");
-    return ESP_OK;
+        httpd_resp_sendstr(req, "Post control value successfully");
+        return ESP_OK;
 }
-
 /* Simple handler for getting system handler */
 static esp_err_t system_info_get_handler(httpd_req_t *req)
 {
@@ -460,29 +544,29 @@ esp_err_t start_rest_server(const char *base_path)
     };
     httpd_register_uri_handler(server, &common_get_uri);
 
-    /* URI handler for light brightness control */
-    httpd_uri_t releyNine_post_uri = {
-        .uri = "/api/v1/r9",
-        .method = HTTP_POST,
-        .handler = releyNine_post_post_handler,
-        .user_ctx = rest_context};
-    httpd_register_uri_handler(server, &releyNine_post_uri);
+    // /* URI handler for light brightness control */
+    // httpd_uri_t releyNine_post_uri = {
+    //     .uri = "/api/v1/r9",
+    //     .method = HTTP_POST,
+    //     .handler = releyNine_post_post_handler,
+    //     .user_ctx = rest_context};
+    // httpd_register_uri_handler(server, &releyNine_post_uri);
 
-    /* URI handler for light brightness control */
-    httpd_uri_t releyOne_post_uri = {
-        .uri = "/api/v1/r1",
-        .method = HTTP_POST,
-        .handler = releyOne_post_post_handler,
-        .user_ctx = rest_context};
-    httpd_register_uri_handler(server, &releyOne_post_uri);
+    // /* URI handler for light brightness control */
+    // httpd_uri_t releyOne_post_uri = {
+    //     .uri = "/api/v1/r1",
+    //     .method = HTTP_POST,
+    //     .handler = releyOne_post_post_handler,
+    //     .user_ctx = rest_context};
+    // httpd_register_uri_handler(server, &releyOne_post_uri);
 
-    /* URI handler for light brightness control */
-    httpd_uri_t releyTwo_post_uri = {
-        .uri = "/api/v1/r2",
-        .method = HTTP_POST,
-        .handler = releyTwo_post_post_handler,
-        .user_ctx = rest_context};
-    httpd_register_uri_handler(server, &releyTwo_post_uri);
+    // /* URI handler for light brightness control */
+    // httpd_uri_t releyTwo_post_uri = {
+    //     .uri = "/api/v1/r2",
+    //     .method = HTTP_POST,
+    //     .handler = releyTwo_post_post_handler,
+    //     .user_ctx = rest_context};
+    // httpd_register_uri_handler(server, &releyTwo_post_uri);
 
     return ESP_OK;
 err_start:
