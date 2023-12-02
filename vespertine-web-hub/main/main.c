@@ -25,6 +25,7 @@
 #include "freertos/event_groups.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
+#include "gbaby_esp.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -45,7 +46,7 @@ static void initialise_mdns(void)
     mdns_init();
     mdns_hostname_set(CONFIG_EXAMPLE_MDNS_HOST_NAME);
     mdns_instance_name_set(MDNS_INSTANCE);
-
+ 
     mdns_txt_item_t serviceTxtData[] = {
         {"board", "esp32"},
         {"path", "/"}
@@ -75,5 +76,8 @@ void app_main(void)
     example_connect();
 
     ESP_ERROR_CHECK(init_fs());
+
+    pinMode(27, GPIO_MODE_OUTPUT);
+    
     ESP_ERROR_CHECK(start_rest_server("")); // TODO: CONFIG_EXAMPLE_WEB_MOUNT_POINT is not working
 }
