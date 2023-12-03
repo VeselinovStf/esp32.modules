@@ -18,9 +18,17 @@
 #include "gbaby_esp.h"
 #include "shift_reley_module.h"
 
-#define LP 4  // SH/LD PIN
-#define CP 2  // CLK PIN
-#define DP 15 // QH PIN
+// #define LP 4  // SH/LD PIN
+// #define CP 2  // CLK PIN
+// #define DP 15 // QH PIN
+
+#define POWER_EXCHAUST_FAN_PIN 27
+#define PUMP_1_PIN 33
+#define PUMP_2_PIN 12
+#define EAR_PUMP_PIN 13
+#define LIGHT_PIN 25
+#define EXCHAUST_FAN_PIN 15
+#define PUMP_3_PIN 4
 
 static const char *REST_TAG = "esp-rest";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
@@ -146,230 +154,6 @@ static esp_err_t light_brightness_post_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-// /* Simple handler for light brightness control */
-// static esp_err_t releyNine_post_post_handler(httpd_req_t *req)
-// {
-//     int total_len = req->content_len;
-//     int cur_len = 0;
-//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-//     int received = 0;
-//     if (total_len >= SCRATCH_BUFSIZE)
-//     {
-//         /* Respond with 500 Internal Server Error */
-//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-//         return ESP_FAIL;
-//     }
-//     while (cur_len < total_len)
-//     {
-//         received = httpd_req_recv(req, buf + cur_len, total_len);
-//         if (received <= 0)
-//         {
-//             /* Respond with 500 Internal Server Error */
-//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-//             return ESP_FAIL;
-//         }
-//         cur_len += received;
-//     }
-//     buf[total_len] = '\0';
-
-//     cJSON *root = cJSON_Parse(buf);
-//     int status = cJSON_GetObjectItem(root, "status")->valueint;
-
-//     if (status > 0)
-//     {
-//         //onn
-//         if (digitalWrite(27,HIGH) != ESP_OK)
-//         {
-//             ESP_LOGE(REST_TAG, "Reley9 Can' start: Status = %d", status);
-//         }else{
-//             ESP_LOGI(REST_TAG, "Reley9 control ONN : Status = %d", status);
-//         }
-//     }
-//     else
-//     {
-//         //off
-//         if (digitalWrite(27, LOW) != ESP_OK)
-//         {
-//             ESP_LOGE(REST_TAG, "Reley9 Can' start: Status = %d", status);
-//         }
-//         else
-//         {
-//             ESP_LOGI(REST_TAG, "Reley9 control OFF : Status = %d", status);
-//         }
-//     }
-
-//     ESP_LOGI(REST_TAG, "Reley9 control: Status = %d", status);
-//     cJSON_Delete(root);
-//     httpd_resp_sendstr(req, "Reley9: Post control value successfully");
-//     return ESP_OK;
-// }
-
-// /* Simple handler for light brightness control */
-// static esp_err_t releyOne_post_post_handler(httpd_req_t *req)
-// {
-//     int total_len = req->content_len;
-//     int cur_len = 0;
-//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-//     int received = 0;
-//     if (total_len >= SCRATCH_BUFSIZE)
-//     {
-//         /* Respond with 500 Internal Server Error */
-//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-//         return ESP_FAIL;
-//     }
-//     while (cur_len < total_len)
-//     {
-//         received = httpd_req_recv(req, buf + cur_len, total_len);
-//         if (received <= 0)
-//         {
-//             /* Respond with 500 Internal Server Error */
-//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-//             return ESP_FAIL;
-//         }
-//         cur_len += received;
-//     }
-//     buf[total_len] = '\0';
-
-//     cJSON *root = cJSON_Parse(buf);
-//     int status = cJSON_GetObjectItem(root, "status")->valueint;
-
-//     if (status > 0)
-//     {
-//         // onn
-//         if (digitalWrite(33, HIGH) != ESP_OK)
-//         {
-//             ESP_LOGE(REST_TAG, "Reley1 Can' start: Status = %d", status);
-//         }
-//         else
-//         {
-//             ESP_LOGI(REST_TAG, "Reley1 control ONN : Status = %d", status);
-//         }
-//     }
-//     else
-//     {
-//         // off
-//         if (digitalWrite(33, LOW) != ESP_OK)
-//         {
-//             ESP_LOGE(REST_TAG, "Reley1 Can' start: Status = %d", status);
-//         }
-//         else
-//         {
-//             ESP_LOGI(REST_TAG, "Reley1 control OFF : Status = %d", status);
-//         }
-//     }
-
-//     ESP_LOGI(REST_TAG, "Reley1 control: Status = %d", status);
-//     cJSON_Delete(root);
-//     httpd_resp_sendstr(req, "Reley1: Post control value successfully");
-//     return ESP_OK;
-// }
-
-/* Simple handler for light brightness control */
-// static esp_err_t releyTwo_post_post_handler(httpd_req_t *req)
-// {
-//     int total_len = req->content_len;
-//     int cur_len = 0;
-//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-//     int received = 0;
-//     if (total_len >= SCRATCH_BUFSIZE)
-//     {
-//         /* Respond with 500 Internal Server Error */
-//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-//         return ESP_FAIL;
-//     }
-//     while (cur_len < total_len)
-//     {
-//         received = httpd_req_recv(req, buf + cur_len, total_len);
-//         if (received <= 0)
-//         {
-//             /* Respond with 500 Internal Server Error */
-//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-//             return ESP_FAIL;
-//         }
-//         cur_len += received;
-//     }
-//     buf[total_len] = '\0';
-
-//     cJSON *root = cJSON_Parse(buf);
-//     int status = cJSON_GetObjectItem(root, "status")->valueint;
-
-//     if (status > 0)
-//     {
-//         // onn
-//         if (digitalWrite(25, HIGH) != ESP_OK)
-//         {
-//             ESP_LOGE(REST_TAG, "Reley2 Can' start: Status = %d", status);
-//         }
-//         else
-//         {
-//             ESP_LOGI(REST_TAG, "Reley2 control ONN : Status = %d", status);
-//         }
-//     }
-//     else
-//     {
-//         // off
-//         if (digitalWrite(25, LOW) != ESP_OK)
-//         {
-//             ESP_LOGE(REST_TAG, "Reley2 Can' start: Status = %d", status);
-//         }
-//         else
-//         {
-//             ESP_LOGI(REST_TAG, "Reley2 control OFF : Status = %d", status);
-//         }
-//     }
-
-//     ESP_LOGI(REST_TAG, "Reley2 control: Status = %d", status);
-//     cJSON_Delete(root);
-//     httpd_resp_sendstr(req, "Reley2: Post control value successfully");
-//     return ESP_OK;
-// }
-
-// /* Simple handler for light brightness control */
-// static esp_err_t reley_post_handler(httpd_req_t *req)
-// {
-//     int total_len = req->content_len;
-//     int cur_len = 0;
-//     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-//     int received = 0;
-//     if (total_len >= SCRATCH_BUFSIZE)
-//     {
-//         /* Respond with 500 Internal Server Error */
-//         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-//         return ESP_FAIL;
-//     }
-//     while (cur_len < total_len)
-//     {
-//         received = httpd_req_recv(req, buf + cur_len, total_len);
-//         if (received <= 0)
-//         {
-//             /* Respond with 500 Internal Server Error */
-//             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-//             return ESP_FAIL;
-//         }
-//         cur_len += received;
-//     }
-//     buf[total_len] = '\0';
-
-//     cJSON *root = cJSON_Parse(buf);
-    
-//     ESP_LOGI(REST_TAG, "Reley Control: value = %s", cJSON_GetObjectItem(root, "value")->valuestring);
-
-//     uint8_t movingBytes = strtol(cJSON_GetObjectItem(root, "value")->valuestring, NULL, 2);
-
-//     shift_reg_conf_t shift_reg_conf;
-
-//     shift_reg_conf.latchPin = LP;
-//     shift_reg_conf.clockPin = CP;
-//     shift_reg_conf.dataPin = DP;
-
-//     initShiftRelay(&shift_reg_conf);
-//     sendToShiftRelay(movingBytes, &shift_reg_conf);
-
-//     cJSON_Delete(root);
-//     httpd_resp_sendstr(req, "Post control value successfully");
-//     return ESP_OK;
-// }
-
 // Define a structure to hold pin numbers
 typedef struct
 {
@@ -378,9 +162,13 @@ typedef struct
 
 // Define an array of structures with GPIO pin numbers
 RelayConfig relayPins[] = {
-    {33}, // Example pin, replace with your actual GPIO pin numbers
-    {25}, // Add more pins as needed
-    {27}, // Add more pins as needed
+    {PUMP_1_PIN},             // Example pin, replace with your actual GPIO pin numbers
+    {PUMP_2_PIN},             // Add more pins as needed
+    {POWER_EXCHAUST_FAN_PIN}, // Add more pins as needed
+    {EAR_PUMP_PIN},           // Add more pins as needed
+    {LIGHT_PIN},              // Add more pins as needed
+    {EXCHAUST_FAN_PIN},       // Add more pins as needed
+    {PUMP_3_PIN},             // Add more pins as needed
     // ...
 };
 
@@ -389,6 +177,7 @@ void setRelayState(int index, uint8_t bitValue)
     // Ensure that the index is within the valid range
     if (index < sizeof(relayPins) / sizeof(relayPins[0]))
     {
+        ESP_LOGI(REST_TAG, "PIN: %d :VALUE: %d", relayPins[index].pin, bitValue);
         // Set the GPIO pin based on the bit value
         gpio_set_level(relayPins[index].pin, bitValue);
     }
