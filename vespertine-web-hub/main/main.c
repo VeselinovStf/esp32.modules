@@ -66,6 +66,8 @@ void app_main(void)
     pinMode(25, GPIO_MODE_OUTPUT);
     pinMode(15, GPIO_MODE_OUTPUT);
     pinMode(4, GPIO_MODE_OUTPUT);
+    pinMode(22, GPIO_MODE_OUTPUT);
+    pinMode(17, GPIO_MODE_OUTPUT);
 
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -73,7 +75,7 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-    
+    +
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 

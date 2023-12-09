@@ -29,6 +29,8 @@
 #define LIGHT_PIN 25
 #define EXCHAUST_FAN_PIN 15
 #define PUMP_3_PIN 4
+#define PUMP_4_PIN 22
+#define PUMP_5_PIN 17
 
 static const char *REST_TAG = "esp-rest";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
@@ -169,6 +171,8 @@ RelayConfig relayPins[] = {
     {LIGHT_PIN},              // Add more pins as needed
     {EXCHAUST_FAN_PIN},       // Add more pins as needed
     {PUMP_3_PIN},             // Add more pins as needed
+    {PUMP_4_PIN},             // Add more pins as needed
+    {PUMP_5_PIN},             // Add more pins as needed
     // ...
 };
 
