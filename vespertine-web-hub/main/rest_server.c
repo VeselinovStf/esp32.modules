@@ -17,6 +17,7 @@
 
 #include "gbaby_esp.h"
 #include "shift_reley_module.h"
+#include "gbaby_dht.h"
 
 // #define LP 4  // SH/LD PIN
 // #define CP 2  // CLK PIN
@@ -32,6 +33,15 @@
 #define PUMP_4_PIN 22
 #define PUMP_5_PIN 17
 
+#define DHT_PLANTS_PIN 21
+#define DHT_ELECTRONICS_PIN 32
+#define DHT_TOTAL_SENSORS = 2
+static const dht_sensor_type_t dht_electronics_sensor_type = DHT_TYPE_DHT11;
+static const gpio_num_t dht_electronics_sensor_gpio = DHT_ELECTRONICS_PIN;
+
+static const dht_sensor_type_t dht_plant_sensor_type = DHT_TYPE_DHT11;
+static const gpio_num_t dht_plants_sensor_gpio = DHT_PLANTS_PIN;
+
 static const char *REST_TAG = "esp-rest";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
     do                                                                                 \
@@ -46,7 +56,8 @@ static const char *REST_TAG = "esp-rest";
 #define FILE_PATH_MAX (ESP_VFS_PATH_MAX + 128)
 #define SCRATCH_BUFSIZE (10240)
 
-typedef struct rest_server_context {
+typedef struct rest_server_context
+{
     char base_path[ESP_VFS_PATH_MAX + 1];
     char scratch[SCRATCH_BUFSIZE];
 } rest_server_context_t;
@@ -57,17 +68,28 @@ typedef struct rest_server_context {
 static esp_err_t set_content_type_from_file(httpd_req_t *req, const char *filepath)
 {
     const char *type = "text/plain";
-    if (CHECK_FILE_EXTENSION(filepath, ".html")) {
+    if (CHECK_FILE_EXTENSION(filepath, ".html"))
+    {
         type = "text/html";
-    } else if (CHECK_FILE_EXTENSION(filepath, ".js")) {
+    }
+    else if (CHECK_FILE_EXTENSION(filepath, ".js"))
+    {
         type = "application/javascript";
-    } else if (CHECK_FILE_EXTENSION(filepath, ".css")) {
+    }
+    else if (CHECK_FILE_EXTENSION(filepath, ".css"))
+    {
         type = "text/css";
-    } else if (CHECK_FILE_EXTENSION(filepath, ".png")) {
+    }
+    else if (CHECK_FILE_EXTENSION(filepath, ".png"))
+    {
         type = "image/png";
-    } else if (CHECK_FILE_EXTENSION(filepath, ".ico")) {
+    }
+    else if (CHECK_FILE_EXTENSION(filepath, ".ico"))
+    {
         type = "image/x-icon";
-    } else if (CHECK_FILE_EXTENSION(filepath, ".svg")) {
+    }
+    else if (CHECK_FILE_EXTENSION(filepath, ".svg"))
+    {
         type = "text/xml";
     }
     return httpd_resp_set_type(req, type);
@@ -80,13 +102,17 @@ static esp_err_t rest_common_get_handler(httpd_req_t *req)
 
     rest_server_context_t *rest_context = (rest_server_context_t *)req->user_ctx;
     strlcpy(filepath, rest_context->base_path, sizeof(filepath));
-    if (req->uri[strlen(req->uri) - 1] == '/') {
+    if (req->uri[strlen(req->uri) - 1] == '/')
+    {
         strlcat(filepath, "/index.html", sizeof(filepath));
-    } else {
+    }
+    else
+    {
         strlcat(filepath, req->uri, sizeof(filepath));
     }
     int fd = open(filepath, O_RDONLY, 0);
-    if (fd == -1) {
+    if (fd == -1)
+    {
         ESP_LOGE(REST_TAG, "Failed to open file : %s", filepath);
         /* Respond with 500 Internal Server Error */
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
@@ -97,14 +123,19 @@ static esp_err_t rest_common_get_handler(httpd_req_t *req)
 
     char *chunk = rest_context->scratch;
     ssize_t read_bytes;
-    do {
+    do
+    {
         /* Read file in chunks into the scratch buffer */
         read_bytes = read(fd, chunk, SCRATCH_BUFSIZE);
-        if (read_bytes == -1) {
+        if (read_bytes == -1)
+        {
             ESP_LOGE(REST_TAG, "Failed to read file : %s", filepath);
-        } else if (read_bytes > 0) {
+        }
+        else if (read_bytes > 0)
+        {
             /* Send the buffer contents as HTTP response chunk */
-            if (httpd_resp_send_chunk(req, chunk, read_bytes) != ESP_OK) {
+            if (httpd_resp_send_chunk(req, chunk, read_bytes) != ESP_OK)
+            {
                 close(fd);
                 ESP_LOGE(REST_TAG, "File sending failed!");
                 /* Abort sending file */
@@ -130,14 +161,17 @@ static esp_err_t light_brightness_post_handler(httpd_req_t *req)
     int cur_len = 0;
     char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
     int received = 0;
-    if (total_len >= SCRATCH_BUFSIZE) {
+    if (total_len >= SCRATCH_BUFSIZE)
+    {
         /* Respond with 500 Internal Server Error */
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
         return ESP_FAIL;
     }
-    while (cur_len < total_len) {
+    while (cur_len < total_len)
+    {
         received = httpd_req_recv(req, buf + cur_len, total_len);
-        if (received <= 0) {
+        if (received <= 0)
+        {
             /* Respond with 500 Internal Server Error */
             httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
             return ESP_FAIL;
@@ -186,8 +220,6 @@ void setRelayState(int index, uint8_t bitValue)
         gpio_set_level(relayPins[index].pin, bitValue);
     }
 }
-
-
 
 /* Simple handler for light brightness control */
 static esp_err_t reley_post_handler(httpd_req_t *req)
@@ -240,12 +272,12 @@ static esp_err_t reley_post_handler(httpd_req_t *req)
         setRelayState(i, bitValue);
 
         // You may introduce a delay here if needed
-        //vTaskDelay(pdMS_TO_TICKS(100)); // Example: 100 ms delay
+        // vTaskDelay(pdMS_TO_TICKS(100)); // Example: 100 ms delay
     }
 
     cJSON_Delete(root);
-        httpd_resp_sendstr(req, "Post control value successfully");
-        return ESP_OK;
+    httpd_resp_sendstr(req, "Post control value successfully");
+    return ESP_OK;
 }
 /* Simple handler for getting system handler */
 static esp_err_t system_info_get_handler(httpd_req_t *req)
@@ -264,11 +296,32 @@ static esp_err_t system_info_get_handler(httpd_req_t *req)
 }
 
 /* Simple handler for getting temperature data */
-static esp_err_t temperature_data_get_handler(httpd_req_t *req)
+static esp_err_t get_dht_data_handler(httpd_req_t *req)
 {
+
+    int16_t temperature = 0;
+    int16_t humidity = 0;
+
+    if (dht_read_data(dht_electronics_sensor_type, dht_electronics_sensor_gpio, &humidity, &temperature) != ESP_OK)
+    {
+        printf("ELECTRONICS:DHT: Could not read data from sensor\n");
+    }
+
+    int16_t p_temperature = 0;
+    int16_t p_humidity = 0;
+
+    if (dht_read_data(dht_plant_sensor_type, dht_plants_sensor_gpio, &p_humidity, &p_temperature) != ESP_OK)
+    {
+        printf("PLANT:DHT: Could not read data from sensor\n");
+    }
+
     httpd_resp_set_type(req, "application/json");
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "raw", esp_random() % 20);
+    cJSON_AddNumberToObject(root, "dht_el_t", temperature / 10);
+    cJSON_AddNumberToObject(root, "dht_el_h", humidity / 10);
+    cJSON_AddNumberToObject(root, "dht_pl_t", p_temperature / 10);
+    cJSON_AddNumberToObject(root, "dht_pl_h", p_humidity / 10);
+
     const char *sys_info = cJSON_Print(root);
     httpd_resp_sendstr(req, sys_info);
     free((void *)sys_info);
@@ -290,33 +343,28 @@ esp_err_t start_rest_server(const char *base_path)
     ESP_LOGI(REST_TAG, "Starting HTTP Server");
     REST_CHECK(httpd_start(&server, &config) == ESP_OK, "Start server failed", err_start);
 
-    
-
     /* URI handler for fetching system info */
     httpd_uri_t system_info_get_uri = {
         .uri = "/api/v1/system/info",
         .method = HTTP_GET,
         .handler = system_info_get_handler,
-        .user_ctx = rest_context
-    };
+        .user_ctx = rest_context};
     httpd_register_uri_handler(server, &system_info_get_uri);
 
     /* URI handler for fetching temperature data */
-    httpd_uri_t temperature_data_get_uri = {
-        .uri = "/api/v1/temp/raw",
+    httpd_uri_t dht_data_get_uri = {
+        .uri = "/api/v1/dht",
         .method = HTTP_GET,
-        .handler = temperature_data_get_handler,
-        .user_ctx = rest_context
-    };
-    httpd_register_uri_handler(server, &temperature_data_get_uri);
+        .handler = get_dht_data_handler,
+        .user_ctx = rest_context};
+    httpd_register_uri_handler(server, &dht_data_get_uri);
 
     /* URI handler for light brightness control */
     httpd_uri_t light_brightness_post_uri = {
         .uri = "/api/v1/light/brightness",
         .method = HTTP_POST,
         .handler = light_brightness_post_handler,
-        .user_ctx = rest_context
-    };
+        .user_ctx = rest_context};
     httpd_register_uri_handler(server, &light_brightness_post_uri);
 
     /* URI handler for light brightness control */
@@ -333,8 +381,7 @@ esp_err_t start_rest_server(const char *base_path)
         .uri = "/*",
         .method = HTTP_GET,
         .handler = rest_common_get_handler,
-        .user_ctx = rest_context
-    };
+        .user_ctx = rest_context};
     httpd_register_uri_handler(server, &common_get_uri);
 
     // /* URI handler for light brightness control */
