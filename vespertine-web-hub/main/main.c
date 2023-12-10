@@ -46,13 +46,12 @@ static void initialise_mdns(void)
     mdns_init();
     mdns_hostname_set(CONFIG_EXAMPLE_MDNS_HOST_NAME);
     mdns_instance_name_set(MDNS_INSTANCE);
- 
-    mdns_txt_item_t serviceTxtData[] = {
-        {"board", "esp32"},
-        {"path", "/"}
-    };
 
-    ESP_ERROR_CHECK(mdns_service_add("ESP32-WebServer", "_http", "_tcp", 80, serviceTxtData,
+    mdns_txt_item_t serviceTxtData[] = {
+        {"board", "gbaby"},
+        {"path", "/"}};
+
+    ESP_ERROR_CHECK(mdns_service_add("GBABY-WebServer", "_http", "_tcp", 80, serviceTxtData,
                                      sizeof(serviceTxtData) / sizeof(serviceTxtData[0])));
 }
 
@@ -75,7 +74,7 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-    +
+
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
