@@ -67,6 +67,11 @@ void app_main(void)
     pinMode(4, GPIO_MODE_OUTPUT);
     pinMode(22, GPIO_MODE_OUTPUT);
     pinMode(17, GPIO_MODE_OUTPUT);
+    // Water Level
+    pinMode(2, GPIO_MODE_OUTPUT);
+    digitalWrite(34, LOW);
+    digitalWrite(35, LOW);
+
 
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {

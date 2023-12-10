@@ -14,6 +14,8 @@
 #include "esp_log.h"
 #include "esp_vfs.h"
 #include "cJSON.h"
+#include "driver/adc.h"
+#include "esp_adc/adc_oneshot.h"
 
 #include "gbaby_esp.h"
 #include "shift_reley_module.h"
@@ -36,11 +38,16 @@
 #define DHT_PLANTS_PIN 21
 #define DHT_ELECTRONICS_PIN 32
 #define DHT_TOTAL_SENSORS = 2
+
 static const dht_sensor_type_t dht_electronics_sensor_type = DHT_TYPE_DHT11;
 static const gpio_num_t dht_electronics_sensor_gpio = DHT_ELECTRONICS_PIN;
 
 static const dht_sensor_type_t dht_plant_sensor_type = DHT_TYPE_DHT11;
 static const gpio_num_t dht_plants_sensor_gpio = DHT_PLANTS_PIN;
+
+#define WATER_LEVEL_POWER_PIN 2
+#define WATER_LEVEL_RESERVOUR_TANK 34
+#define WATER_LEVEL_PLANTS_TANK 35
 
 static const char *REST_TAG = "esp-rest";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
@@ -155,40 +162,26 @@ static esp_err_t rest_common_get_handler(httpd_req_t *req)
 }
 
 /* Simple handler for light brightness control */
-static esp_err_t light_brightness_post_handler(httpd_req_t *req)
-{
-    int total_len = req->content_len;
-    int cur_len = 0;
-    char *buf = ((rest_server_context_t *)(req->user_ctx))->scratch;
-    int received = 0;
-    if (total_len >= SCRATCH_BUFSIZE)
-    {
-        /* Respond with 500 Internal Server Error */
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
-        return ESP_FAIL;
-    }
-    while (cur_len < total_len)
-    {
-        received = httpd_req_recv(req, buf + cur_len, total_len);
-        if (received <= 0)
-        {
-            /* Respond with 500 Internal Server Error */
-            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
-            return ESP_FAIL;
-        }
-        cur_len += received;
-    }
-    buf[total_len] = '\0';
+// static esp_err_t water_level_get_handler(httpd_req_t *req)
+// {
 
-    cJSON *root = cJSON_Parse(buf);
-    int red = cJSON_GetObjectItem(root, "red")->valueint;
-    int green = cJSON_GetObjectItem(root, "green")->valueint;
-    int blue = cJSON_GetObjectItem(root, "blue")->valueint;
-    ESP_LOGI(REST_TAG, "Light control: red = %d, green = %d, blue = %d", red, green, blue);
-    cJSON_Delete(root);
-    httpd_resp_sendstr(req, "Post control value successfully");
-    return ESP_OK;
-}
+//      digitalWrite(WATER_LEVEL_POWER_PIN, HIGH);
+
+//     digitalWrite(WATER_LEVEL_POWER_PIN, LOW); // turn the sensor OFF
+
+//     httpd_resp_set_type(req, "application/json");
+//     cJSON *root = cJSON_CreateObject();
+//     cJSON_AddNumberToObject(root, "plants", water_level_plants);
+//     cJSON_AddNumberToObject(root, "reservour", water_level_resorvour);
+
+//     const char *sys_info = cJSON_Print(root);
+//     httpd_resp_sendstr(req, sys_info);
+//     free((void *)sys_info);
+//     cJSON_Delete(root);
+
+//     return ESP_OK;
+
+// }
 
 // Define a structure to hold pin numbers
 typedef struct
@@ -315,6 +308,8 @@ static esp_err_t get_dht_data_handler(httpd_req_t *req)
         printf("PLANT:DHT: Could not read data from sensor\n");
     }
 
+    vTaskDelay(200);
+
     httpd_resp_set_type(req, "application/json");
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "dht_el_t", temperature / 10);
@@ -360,12 +355,12 @@ esp_err_t start_rest_server(const char *base_path)
     httpd_register_uri_handler(server, &dht_data_get_uri);
 
     /* URI handler for light brightness control */
-    httpd_uri_t light_brightness_post_uri = {
-        .uri = "/api/v1/light/brightness",
-        .method = HTTP_POST,
-        .handler = light_brightness_post_handler,
-        .user_ctx = rest_context};
-    httpd_register_uri_handler(server, &light_brightness_post_uri);
+    // httpd_uri_t water_level_get_uri = {
+    //     .uri = "/api/v1/water-level",
+    //     .method = HTTP_GET,
+    //     .handler = water_level_get_handler,
+    //     .user_ctx = rest_context};
+    // httpd_register_uri_handler(server, &water_level_get_uri);
 
     /* URI handler for light brightness control */
     httpd_uri_t reley_post_uri = {

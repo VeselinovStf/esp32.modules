@@ -1,7 +1,7 @@
 idf_component_register(SRCS "main.c"
                             "rest_server.c"
                     INCLUDE_DIRS "."
-                    PRIV_REQUIRES esp_netif driver esp_wifi vfs nvs_flash fatfs spiffs esp_http_server json
+                    PRIV_REQUIRES esp_netif driver esp_wifi vfs nvs_flash fatfs spiffs esp_http_server json esp_adc
                     REQUIRES gbaby_wifi mdns gbaby_fs gbaby_esp shift_reley_module gbaby_dht)
 
 
